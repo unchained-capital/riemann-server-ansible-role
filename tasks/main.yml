@@ -31,7 +31,6 @@
 
 - name: Create configuration directory
   file: path={{ riemann_conf_dir }}/conf.d state=directory recurse=yes owner=root group=root mode=0755
-  when: riemann_write_config
   tags:
     - riemann-server
 
