@@ -3,9 +3,10 @@
 #
 # Installation
 #
-riemann_version:      0.2.11    # latest as of 2016-07-04
+riemann_version:      0.2.12    # latest as of 2016-12-22
 riemann_state:        started
 riemann_enable:       yes
+riemann_release_url_base: "https://github.com/riemann/riemann/releases/download/{{ riemann_version }}"
 
 #
 # Directories

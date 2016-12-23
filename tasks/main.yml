@@ -1,46 +1,50 @@
 ---
 
-- name: Ensure Riemann download directory exists
+- name: Ensure download directory exists
   file: path={{ riemann_download_dir }} state=directory owner=root group=root mode=0755
   tags:
+    - dirs
     - riemann-server
 
-- name: Download Riemann release
+- name: Ensure release has been downloaded (Debian)
   when: ansible_os_family == "Debian"
-  get_url: url="https://aphyr.com/riemann/riemann_{{ riemann_version }}_all.deb" dest="{{ riemann_download_dir }}/riemann_{{ riemann_version }}.deb"
+  get_url: url="{{ riemann_release_url_base }}/riemann_{{ riemann_version }}_all.deb" dest="{{ riemann_download_dir }}/riemann_{{ riemann_version }}.deb"
   tags:
     - riemann-server
 
-- name: Download Riemann release
+- name: Ensure release has been downloaded (RedHat)
   when: ansible_os_family == "RedHat"
-  get_url: url="https://aphyr.com/riemann/riemann_{{ riemann_version }}-1.noarch.rpm" dest="{{ riemann_download_dir }}/riemann_{{ riemann_version }}.rpm"
+  get_url: url="{{ riemann_release_url_base }}/riemann-{{ riemann_version }}-1.noarch.rpm" dest="{{ riemann_download_dir }}/riemann_{{ riemann_version }}.rpm"
   tags:
     - riemann-server
 
-- name: Install Riemann release
+- name: Ensure release has been installed (Debian)
   when: ansible_os_family == "Debian"
   apt: deb="{{ riemann_download_dir }}/riemann_{{ riemann_version }}.deb" state=present
   tags:
     - riemann-server
 
-- name: Download & install Riemann release
+- name: Ensure release has been installed (RedHat)
   when: ansible_os_family == "RedHat"
   yum: name="{{ riemann_download_dir}}/riemann_{{ riemann_version }}.rpm" state=present
   tags:
     - riemann-server
 
-- name: Create configuration directory
+- name: Ensure configuration directory exists
   file: path={{ riemann_conf_dir }}/conf.d state=directory recurse=yes owner=root group=root mode=0755
   tags:
+    - dirs
     - riemann-server
 
-- name: Create configuration file
+- name: Ensure configuration file is correct
   template: src=riemann.config.j2 dest={{ riemann_conf_dir }}/riemann.config owner=root group=root mode=0644
   when: riemann_write_config
   tags:
+    - config
     - riemann-server
 
-- name: Start Riemann server
+- name: Ensure service state is correct
   service: name=riemann state={{ riemann_state }} enabled={{ riemann_enable }}
   tags:
+    - service
     - riemann-server
